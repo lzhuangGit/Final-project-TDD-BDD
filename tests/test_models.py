@@ -127,3 +127,23 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(Decimal(found_product.price), product.price)
         self.assertEqual(found_product.available, product.available)
         self.assertEqual(found_product.category, product.category)
+
+    def test_update_a_product(self):
+        """It should update a Product"""
+        product = ProductFactory()
+        app.logger.info("Create %s", str(product))
+        product.id = None
+        product.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(product.id)
+        app.logger.info("Created %s", str(product))
+        product_id=product.id
+        product.description = "New description"
+        product.update()
+        self.assertEqual(product.id, product_id)
+        self.assertEqual(product.description, "New description")
+        products = Product.all()
+        # Assert the length of the products list is equal to 1 to verify that after updating the product, there is only one product in the system.
+        self.assertEqual(len(products), 1)
+        self.assertEqual(products[0].id, product_id)
+        self.assertEqual(products[0].description, product.description)
