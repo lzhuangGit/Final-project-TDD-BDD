@@ -98,28 +98,25 @@ def create_products():
 # L I S T   A L L   P R O D U C T S
 ######################################################################
 
-#
-# PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
-#
-
 
 @app.route('/products', methods=['GET'])
 def list_products():
     """Returns a list of Products"""
     app.logger.info("Request to list Products...")
 
-    products = Product.all()
-    results = [product.serialize() for product in products]
+    products = []
+    name = request.args.get('name')
+    if name:
+        products = Product.find_by_name(name)
+    else:
+        products = Product.all()
 
+    results = [product.serialize() for product in products]
     return results, status.HTTP_200_OK
 
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
-
-#
-# PLACE YOUR CODE HERE TO READ A PRODUCT
-#
 
 
 @app.route('/products/<int:product_id>', methods=['GET'])
@@ -134,10 +131,6 @@ def get_products(product_id):
 ######################################################################
 # U P D A T E   A   P R O D U C T
 ######################################################################
-
-#
-# PLACE YOUR CODE TO UPDATE A PRODUCT HERE
-#
 
 
 @app.route('/products/<int:product_id>', methods=['POST'])
@@ -161,11 +154,6 @@ def update_products(product_id):
 ######################################################################
 # D E L E T E   A   P R O D U C T
 ######################################################################
-
-
-#
-# PLACE YOUR CODE TO DELETE A PRODUCT HERE
-#
 
 
 @app.route('/products/<int:product_id>', methods=['DELETE'])
