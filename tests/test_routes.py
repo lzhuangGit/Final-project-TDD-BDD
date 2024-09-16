@@ -176,6 +176,19 @@ class TestProductRoutes(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.assertEqual(response.get_json()["name"], test_product.name)
 
+    def test_update_product(self):
+        """It should update a product by ID"""
+        test_product = self._create_products(1)[0]
+
+        response = self.client.get(f"{BASE_URL}/{test_product.id}")
+        new_product = response.get_json()
+        self.assertEqual(new_product['name'], test_product.name)
+        new_product['description'] = "New Description"
+        response = self.client.post(f"{BASE_URL}/{new_product['id']}", json=new_product)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        updated_product = response.get_json()
+        self.assertEqual(updated_product["description"], "New Description")
+
     ######################################################################
     # Utility functions
     ######################################################################

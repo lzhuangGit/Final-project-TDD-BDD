@@ -111,7 +111,7 @@ def create_products():
 #
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_products(product_id):
-    """ Retrieve product by ID """
+    """ It should Retrieve a product by ID """
     product = Product.find(product_id)
     if not product:
         return status.HTTP_404_NOT_FOUND
@@ -125,6 +125,25 @@ def get_products(product_id):
 #
 # PLACE YOUR CODE TO UPDATE A PRODUCT HERE
 #
+
+
+@app.route('/products/<int:product_id>', methods=['POST'])
+def update_products(product_id):
+    """
+    Update an Product
+    This endpoint will update a Product based on the body that is posted
+    """
+    app.logger.info("Request to Update a product with id [%s]", product_id)
+    check_content_type("application/json")
+
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with ID {product_id} not found")
+
+    product.deserialize(request.get_json())
+    # assert product.id == product_id, f"product.id: {product.id} shoud be the same as product_id: {product_id}"
+    product.update()
+    return product.serialize(), status.HTTP_200_OK
 
 ######################################################################
 # D E L E T E   A   P R O D U C T
