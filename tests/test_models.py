@@ -120,18 +120,16 @@ class TestProductModel(unittest.TestCase):
             'available': True,
             'category': "CLOTHS"
         }
-        
+
         new_prod = prod.copy()
         new_prod['available'] = 'blah'
-        product=Product()
+        product = Product()
         self.assertRaises(DataValidationError, product.deserialize, new_prod)
 
         new_prod = prod.copy()
         del new_prod['name']
-        product=Product()
+        product = Product()
         self.assertRaises(DataValidationError, product.deserialize, new_prod)
-
-
 
     def test_add_a_product(self):
         """It should Create a product and add it to the database"""
@@ -193,7 +191,7 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products[0].id, product_id)
         self.assertEqual(products[0].description, "New description")
 
-    def test_update_a_product_with_empty_ID(self):
+    def test_update_a_product_with_empty_id(self):
         """It should raise a DataValidationError"""
         product = ProductFactory()
         logger.info("Create %s", str(product))
@@ -202,10 +200,9 @@ class TestProductModel(unittest.TestCase):
         # Assert that it was assigned an id and shows up in the database
         self.assertIsNotNone(product.id)
         logger.info("Created %s", str(product))
-        product_id = product.id
         product.id = None
         self.assertRaises(DataValidationError, product.update)
-    
+
     def test_delete_a_product(self):
         """It should delete a Product"""
         product = ProductFactory()
