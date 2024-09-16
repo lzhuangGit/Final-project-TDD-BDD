@@ -47,6 +47,7 @@ def step_impl(context):
     # load the database with new products
     #
     for row in context.table:
-        #
-        # ADD YOUR CODE HERE TO CREATE PRODUCTS VIA THE REST API
-        #
+        product = {heading: row[heading] for heading in row.headings}
+        product['available'] = product['available'].lower() in ['true', 'yes', '1']
+        context.resp = requests.post(rest_endpoint, json=product)
+        assert(context.resp.status_code == HTTP_201_CREATED)
