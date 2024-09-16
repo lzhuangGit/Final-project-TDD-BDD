@@ -27,7 +27,7 @@ import os
 import logging
 import unittest
 from decimal import Decimal
-from service.models import Product, Category, db
+from service.models import Product, Category, db, DataValidationError
 from service import app
 from tests.factories import ProductFactory
 
@@ -111,6 +111,28 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(product.price, 12.50)
         self.assertEqual(product.category, Category.CLOTHS)
 
+    def test_product_deserialize_data_error(self):
+        """It should raise exception of DataValidationError """
+        prod = {
+            'name': "Fedora",
+            'description': "A red hat",
+            'price': 12.50,
+            'available': True,
+            'category': "CLOTHS"
+        }
+        
+        new_prod = prod.copy()
+        new_prod['available'] = 'blah'
+        product=Product()
+        self.assertRaises(DataValidationError, product.deserialize, new_prod)
+
+        new_prod = prod.copy()
+        del new_prod['name']
+        product=Product()
+        self.assertRaises(DataValidationError, product.deserialize, new_prod)
+
+
+
     def test_add_a_product(self):
         """It should Create a product and add it to the database"""
         products = Product.all()
@@ -171,6 +193,19 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(products[0].id, product_id)
         self.assertEqual(products[0].description, "New description")
 
+    def test_update_a_product_with_empty_ID(self):
+        """It should raise a DataValidationError"""
+        product = ProductFactory()
+        logger.info("Create %s", str(product))
+        product.id = None
+        product.create()
+        # Assert that it was assigned an id and shows up in the database
+        self.assertIsNotNone(product.id)
+        logger.info("Created %s", str(product))
+        product_id = product.id
+        product.id = None
+        self.assertRaises(DataValidationError, product.update)
+    
     def test_delete_a_product(self):
         """It should delete a Product"""
         product = ProductFactory()
@@ -237,3 +272,16 @@ class TestProductModel(unittest.TestCase):
         self.assertEqual(found_products.count(), count)
         for product in found_products:
             self.assertEqual(product.category, category)
+
+    def test_find_by_price(self):
+        """It should find a Product by price"""
+        products = ProductFactory.create_batch(10)
+        for product in products:
+            product.create()
+
+        price = products[0].price
+        count = len([product for product in products if product.price == price])
+        found_products = Product.find_by_price(str(price))
+        self.assertEqual(found_products.count(), count)
+        for product in found_products:
+            self.assertEqual(product.price, price)
