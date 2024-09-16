@@ -102,6 +102,17 @@ def create_products():
 # PLACE YOUR CODE TO LIST ALL PRODUCTS HERE
 #
 
+
+@app.route('/products', methods=['GET'])
+def list_products():
+    """Returns a list of Products"""
+    app.logger.info("Request to list Products...")
+
+    products = Product.all()
+    results = [product.serialize() for product in products]
+
+    return results, status.HTTP_200_OK
+
 ######################################################################
 # R E A D   A   P R O D U C T
 ######################################################################
@@ -109,12 +120,14 @@ def create_products():
 #
 # PLACE YOUR CODE HERE TO READ A PRODUCT
 #
+
+
 @app.route('/products/<int:product_id>', methods=['GET'])
 def get_products(product_id):
     """ It should Retrieve a product by ID """
     product = Product.find(product_id)
     if not product:
-        return status.HTTP_404_NOT_FOUND
+        return b'', status.HTTP_404_NOT_FOUND
 
     return product.serialize(), status.HTTP_200_OK
 
@@ -153,3 +166,19 @@ def update_products(product_id):
 #
 # PLACE YOUR CODE TO DELETE A PRODUCT HERE
 #
+
+
+@app.route('/products/<int:product_id>', methods=['DELETE'])
+def delete_products(product_id):
+    """
+    Delete an Product
+    This endpoint will delete a Product with the product_id
+    """
+    app.logger.info("Request to Delete a product with id [%s]", product_id)
+
+    product = Product.find(product_id)
+    if not product:
+        abort(status.HTTP_404_NOT_FOUND, f"Product with ID {product_id} not found")
+
+    product.delete()
+    return b'', status.HTTP_204_NO_CONTENT
