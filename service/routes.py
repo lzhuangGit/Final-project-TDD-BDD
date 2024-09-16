@@ -113,7 +113,7 @@ def list_products():
     elif category_name:
         products = Product.find_by_category(Category[category_name.upper()])
     elif available:
-        available_value = available.lower() in ['treu', 'yes', '1']
+        available_value = available.lower() in ['true', 'yes', '1']
         products = Product.find_by_availability(available_value)
     else:
         products = Product.all()
